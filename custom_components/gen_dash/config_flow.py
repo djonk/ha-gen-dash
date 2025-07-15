@@ -31,15 +31,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             # Validate the selected agent exists
+            entity_registry = er.async_get(self.hass)
             agent_id = user_input[CONF_AGENT_ID]
-            agent_state = self.hass.states.get(agent_id)
-            
-            if agent_state is None:
+            entry = entity_registry.async_get(agent_id)
+
+            if entry is None:
                 errors[CONF_AGENT_ID] = "agent_not_found"
             else:
-                # Create the config entry
+                title = entry.name or entry.original_name or agent_id
                 return self.async_create_entry(
-                    title=f"Gen-Dash ({agent_state.attributes.get('friendly_name', agent_id)})",
+                    title=f"Gen-Dash ({title})",
                     data=user_input,
                 )
 
