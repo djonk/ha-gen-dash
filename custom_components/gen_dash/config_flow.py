@@ -49,7 +49,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         entries = er.async_entries_for_domain(entity_registry, "conversation")
         
         conversation_entities = [
-            {"value": entry.entity_id, "label": entry.name or entry.entity_id}
+            {"value": entry.entity_id, "label": entry.name or entry.original_name or entry.entity_id}
             for entry in entries
         ]
 
