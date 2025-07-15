@@ -16,6 +16,7 @@ from .const import DOMAIN, CONF_AGENT_ID
 _LOGGER = logging.getLogger(__name__)
 
 
+@config_entries.HANDLERS.register(DOMAIN)
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Gen-Dash."""
 

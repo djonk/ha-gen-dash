@@ -2,8 +2,10 @@
   "domain": "gen_dash",
   "name": "Gen-Dash",
   "version": "1.0.0",
+  "documentation": "https://github.com/djonkleine/ha-gen-dash",
   "dependencies": ["conversation"],
   "config_flow": true,
+  "codeowners": ["@djonkleine"],
   "requirements": ["aiohttp"],
   "iot_class": "cloud_polling"
-} 
+}
