@@ -3,5 +3,6 @@
   "hacs": "1.6.0",
   "domains": ["gen_dash"],
   "iot_class": "cloud_polling",
-  "render_readme": true
-} 
+  "render_readme": true,
+  "filename": "custom_components/gen_dash/frontend/dist/gen-dash-card.js"
+}

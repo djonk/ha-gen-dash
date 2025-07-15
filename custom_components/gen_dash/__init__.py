@@ -46,7 +46,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN][entry.entry_id] = entry.data
     
     # Register the frontend resources
-    await _register_frontend_resources(hass)
     
     return True
 
@@ -65,82 +64,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def _register_frontend_resources(hass: HomeAssistant) -> None:
-    """Register the frontend resources (JavaScript card)."""
-    try:
-        # Path to the compiled JavaScript file
-        integration_dir = os.path.dirname(__file__)
-        frontend_dir = os.path.join(integration_dir, "frontend")
-        dist_dir = os.path.join(frontend_dir, "dist")
-        js_file = os.path.join(dist_dir, "gen-dash-card.js")
-        
-        # Check if the compiled file exists
-        if not os.path.exists(js_file):
-            _LOGGER.warning(
-                "Frontend JavaScript file not found at %s. "
-                "Make sure to build the frontend with 'npm run build'",
-                js_file
-            )
-            return
-        
-        # Register the static path for serving the JavaScript file
-        hass.http.register_static_path(
-            "/gen-dash/gen-dash-card.js",
-            js_file,
-            cache_headers=False,  # Disable caching during development
-        )
-        
-        # Register the Lovelace resource
-        # Note: This registration method depends on the Home Assistant version
-        # For newer versions, we might need to use a different approach
-        try:
-            # Try the newer method first
-            from homeassistant.components.lovelace.resources import ResourceStorageCollection
-            
-            # This is a simplified approach - in a real implementation, you might
-            # want to check if the resource is already registered
-            resource_collection: ResourceStorageCollection = hass.data.get("lovelace", {}).get("resources")
-            
-            if resource_collection:
-                # Add the resource to the collection
-                await resource_collection.async_create_item({
-                    "url": "/gen-dash/gen-dash-card.js",
-                    "type": "module",
-                })
-                _LOGGER.info("Registered Gen-Dash card as Lovelace resource")
-            else:
-                _LOGGER.debug("Lovelace resources collection not available")
-                
-        except ImportError:
-            # Fallback for older Home Assistant versions
-            _LOGGER.debug("Using fallback method for Lovelace resource registration")
-            
-            # For older versions, we might need to use websocket commands
-            # or other methods to register the resource
-            pass
-        
-        # Alternative: Register using the frontend.add_extra_module_url service
-        # This is another way to add custom JavaScript modules
-        try:
-            await hass.services.async_call(
-                "frontend",
-                "add_extra_module_url",
-                {
-                    "url": "/gen-dash/gen-dash-card.js",
-                    "type": "module",
-                },
-                blocking=False,
-            )
-            _LOGGER.debug("Added Gen-Dash card via frontend service")
-        except Exception as e:
-            _LOGGER.debug("Could not add module via frontend service: %s", str(e))
-        
-        _LOGGER.info("Gen-Dash frontend resources registered successfully")
-        
-    except Exception as e:
-        _LOGGER.error("Error registering frontend resources: %s", str(e))
-        # Don't fail the setup if frontend registration fails
-        # The integration can still work via API calls
 
 
 async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
