@@ -9,6 +9,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.selector import SelectSelector, SelectSelectorConfig, SelectSelectorMode
 
 from .const import DOMAIN, CONF_AGENT_ID
@@ -43,13 +44,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
 
         # Get all conversation entities (agents)
-        conversation_entities = []
-        for state in self.hass.states.async_all("conversation"):
-            friendly_name = state.attributes.get("friendly_name", state.entity_id)
-            conversation_entities.append({
-                "value": state.entity_id,
-                "label": friendly_name,
-            })
+        entity_registry = er.async_get(self.hass)
+        entries = er.async_entries_for_domain(entity_registry, "conversation")
+        
+        conversation_entities = [
+            {"value": entry.entity_id, "label": entry.name or entry.entity_id}
+            for entry in entries
+        ]
 
         if not conversation_entities:
             return self.async_abort(reason="no_conversation_agents")

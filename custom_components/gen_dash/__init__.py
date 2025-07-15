@@ -10,6 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.typing import ConfigType
 
+from . import config_flow
 from .api import GenDashGenerateView
 from .const import DOMAIN
 
