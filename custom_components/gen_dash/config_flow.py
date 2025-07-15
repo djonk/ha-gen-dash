@@ -44,13 +44,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         # Get all conversation entities (agents)
         conversation_entities = []
-        for entity_id, state in self.hass.states.async_all().items():
-            if entity_id.startswith("conversation."):
-                friendly_name = state.attributes.get("friendly_name", entity_id)
-                conversation_entities.append({
-                    "value": entity_id,
-                    "label": friendly_name,
-                })
+        for state in self.hass.states.async_all("conversation"):
+            friendly_name = state.attributes.get("friendly_name", state.entity_id)
+            conversation_entities.append({
+                "value": state.entity_id,
+                "label": friendly_name,
+            })
 
         if not conversation_entities:
             return self.async_abort(reason="no_conversation_agents")
